@@ -1,0 +1,89 @@
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  background-color: #faf8ef;
+  color: #776e65;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+div {
+  display: flex;
+  flex-direction: row;
+}
+
+#top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 70vw;
+  height: calc(70vw / 4);
+  margin-bottom: 20px;
+  font-size: 7vw;
+}
+
+#bottom-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70vw;
+  height: calc(70vw / 4);
+  margin-top: 20px;
+  font-size: 7vw;
+}
+
+#game-board {
+  width: 70vw;
+  height: 70vw;
+  display: flex;
+  flex-direction: column;
+  background-color: #bbada0;
+  border-radius: 2vw;
+  padding: 0.75vw;
+}
+
+.row {
+  height: 25%;
+  display: flex;
+}
+
+.cell {
+  display: flex;
+  width: 25%;
+  justify-content: center;
+  align-items: center;
+  font-size: 7vw;
+  border-radius: 2vw;
+  background-color: #d6cdc4;
+  margin: 0.75vw;
+}
+
+._2 {
+  background-color: #eee4da;
+}
+
+._4 {
+  background-color: #ede0c8;
+}
+
+._8 {
+  background-color: #f2b179;
+  color: white;
+}
+
+._16 {
+  background-color: #f59563;
+  color: white;
+}
+
+._32 {
+  background-color: #f67c5f;
+  color: white;
+}
+
+._64 {
+  background-color: #f65e3b;
+  color: white;
+}
