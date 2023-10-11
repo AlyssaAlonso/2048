@@ -7,7 +7,7 @@ body {
   background-color: #faf8ef;
   color: #776e65;
   font-family: Arial, Helvetica, sans-serif;
-  margin: 50px;
+  margin: 0 auto;
 }
 
 div {
@@ -15,34 +15,55 @@ div {
   flex-direction: row;
 }
 
+button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
 #top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 70vw;
-  height: calc(40vw / 4);
+  width: 28vw;
+  height: calc(28vw / 4);
   margin-bottom: 10px;
-  font-size: 7vw;
+  font-size: 2.8vw;
+}
+
+#score {
+  font-size: 2vw;
+}
+
+#game-end-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 28vw;
+  height: calc(28vw / 8);
+  margin: 10px auto 0;
+  font-size: 2.8vw;
+}
+
+#game-board {
+  width: 28vw;
+  height: 28vw;
+  display: flex;
+  flex-direction: column;
+  background-color: #bbada0;
+  border-radius: 1.4vw;
+  padding: 0.3vw;
 }
 
 #bottom-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 70vw;
-  height: calc(70vw / 4);
-  margin-top: 10px;
-  font-size: 7vw;
-}
-
-#game-board {
-  width: 70vw;
-  height: 70vw;
-  display: flex;
-  flex-direction: column;
-  background-color: #bbada0;
-  border-radius: 2vw;
-  padding: 0.75vw;
+  width: 28vw;
+  height: calc(28vw / 8);
+  margin: 0 auto;
+  font-size: 28vw;
 }
 
 .row {
@@ -55,10 +76,11 @@ div {
   width: 25%;
   justify-content: center;
   align-items: center;
-  font-size: 7vw;
-  border-radius: 2vw;
+  font-size: 2.8vw;
+  border-radius: 0.8vw;
   background-color: #d6cdc4;
-  margin: 0.75vw;
+  margin: 0.3vw;
+  padding: 0;
 }
 
 ._2 {
@@ -112,15 +134,5 @@ div {
 ._2048 {
   background-color: #edc22e;
   color: white;
-  font-size: 6vw;
-}
-
-#score {
-  font-size: 5vw;
-}
-
-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  font-size: 2.4vw;
 }

@@ -4,11 +4,16 @@ const rowEls = gameBoardEl.children;
 const scoreEl = document.querySelector("#score");
 const restartBtn = document.querySelector(".restart");
 const undoBtn = document.querySelector(".undo");
+const gameEndMessageEl = document.querySelector("#game-end-message");
 
 // State:
 const newCell = [2, 4];
 const arrowKeys = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
 let score = 0;
+let previousScore = 0;
+let currentScore = 0;
+let winner = false;
+let loser = false;
 
 const gameBoard = [
   [0, 0, 0, 0],
@@ -17,7 +22,14 @@ const gameBoard = [
   [0, 0, 0, 0],
 ];
 
-const previousTurn = [
+const previousBoard = [
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+];
+
+const currentBoard = [
   [0, 0, 0, 0],
   [0, 0, 0, 0],
   [0, 0, 0, 0],
@@ -26,9 +38,7 @@ const previousTurn = [
 
 // Event Listeners:
 document.addEventListener("keyup", (e) => {
-  if (!arrowKeys.includes(e.code)) return;
-
-  updatePreviousTurn();
+  if (!arrowKeys.includes(e.code) || winner || loser) return;
 
   if (e.code === "ArrowUp") {
     shiftUp();
@@ -40,8 +50,16 @@ document.addEventListener("keyup", (e) => {
     shiftLeft();
   }
 
-  generateNewCell();
-  render();
+  let addMoveToBoard = checkShift();
+
+  if (addMoveToBoard === true) {
+    updatepreviousBoard();
+    generateNewCell();
+    checkGameEnd();
+    render();
+  } else {
+    return;
+  }
 });
 
 undoBtn.onclick = (e) => {
@@ -49,19 +67,27 @@ undoBtn.onclick = (e) => {
   render();
 };
 
-// Functions:
+restartBtn.onclick = (e) => {
+  gameRestart();
+};
 
-const generateNewCell = () => {
-  // find all empty cells
-  let emptyCells = [];
+// Functions:
+const findEmptyCells = () => {
+  let arr = [];
 
   gameBoard.forEach((row, rowIdx) => {
     row.forEach((cell, cellIdx) => {
       if (gameBoard[rowIdx][cellIdx] === 0) {
-        emptyCells.push([rowIdx, cellIdx]);
+        arr.push([rowIdx, cellIdx]);
       }
     });
   });
+
+  return arr;
+};
+
+const generateNewCell = () => {
+  let emptyCells = findEmptyCells();
 
   // pick a random empty cell
   let idx = Math.floor(Math.random() * emptyCells.length);
@@ -72,11 +98,12 @@ const generateNewCell = () => {
     newCell[Math.round(Math.random())];
 };
 
-// updatePreviousTurn
-const updatePreviousTurn = () => {
-  gameBoard.forEach((row, rowIdx) => {
+const updatepreviousBoard = () => {
+  previousScore = currentScore;
+
+  previousBoard.forEach((row, rowIdx) => {
     row.forEach((cell, cellIdx) => {
-      previousTurn[rowIdx][cellIdx] = gameBoard[rowIdx][cellIdx];
+      previousBoard[rowIdx][cellIdx] = currentBoard[rowIdx][cellIdx];
     });
   });
 };
@@ -179,9 +206,56 @@ const shiftDown = () => {
   });
 };
 
-// checkGameEnd
-// Win => If any cell equals 2048
-// Lose => If there are no possible moves (i.e. nothing can be merged, no empty cells)
+const checkGameEnd = () => {
+  updateCurrentBoard();
+
+  gameBoard.forEach((row, rowIdx) => {
+    row.forEach((cell, cellIdx) => {
+      if (gameBoard[rowIdx][cellIdx] === 2048) {
+        winner = true;
+      }
+    });
+  });
+
+  let numEmptyCells = findEmptyCells().length;
+
+  if (numEmptyCells === 0) {
+    let possibleUp;
+    let possibleDown;
+    let possibleLeft;
+    let possibleRight;
+
+    shiftUp();
+    possibleUp = checkShift();
+
+    if (possibleUp === false) {
+      shiftDown();
+      possibleDown = checkShift();
+    }
+
+    if (possibleDown === false) {
+      shiftLeft();
+      possibleLeft = checkShift();
+    }
+
+    if (possibleLeft === false) {
+      shiftRight();
+      possibleRight = checkShift();
+    }
+
+    if (possibleRight === false) {
+      loser = true;
+    }
+
+    score = currentScore;
+
+    gameBoard.forEach((row, rowIdx) => {
+      row.forEach((cell, cellIdx) => {
+        gameBoard[rowIdx][cellIdx] = currentBoard[rowIdx][cellIdx];
+      });
+    });
+  }
+};
 
 const render = () => {
   const rowElsArr = Array.from(rowEls);
@@ -201,12 +275,50 @@ const render = () => {
   });
 
   scoreEl.textContent = `Score: ${score}`;
+
+  if (winner === true) {
+    gameEndMessageEl.textContent = "You win!";
+  }
+
+  if (loser === true) {
+    gameEndMessageEl.textContent = "Game Over.";
+  }
 };
 
 const undoMove = () => {
+  gameEndMessageEl.textContent = "";
+  winner = false;
+  loser = false;
+  score = previousScore;
+  currentScore = previousScore;
   gameBoard.forEach((row, rowIdx) => {
     row.forEach((cell, cellIdx) => {
-      gameBoard[rowIdx][cellIdx] = previousTurn[rowIdx][cellIdx];
+      gameBoard[rowIdx][cellIdx] = previousBoard[rowIdx][cellIdx];
+      currentBoard[rowIdx][cellIdx] = previousBoard[rowIdx][cellIdx];
+    });
+  });
+};
+
+const checkShift = () => {
+  let boardShift = false;
+
+  gameBoard.forEach((row, rowIdx) => {
+    row.forEach((cell, cellIdx) => {
+      if (currentBoard[rowIdx][cellIdx] !== gameBoard[rowIdx][cellIdx]) {
+        boardShift = true;
+      }
+    });
+  });
+
+  return boardShift;
+};
+
+const updateCurrentBoard = () => {
+  currentScore = score;
+
+  gameBoard.forEach((row, rowIdx) => {
+    row.forEach((cell, cellIdx) => {
+      currentBoard[rowIdx][cellIdx] = gameBoard[rowIdx][cellIdx];
     });
   });
 };
@@ -215,6 +327,25 @@ const gameStart = () => {
   generateNewCell();
   generateNewCell();
   render();
+};
+
+const gameRestart = () => {
+  gameEndMessageEl.textContent = "";
+  winner = false;
+  loser = false;
+  score = 0;
+  currentScore = 0;
+  previousScore = 0;
+
+  gameBoard.forEach((row, rowIdx) => {
+    row.forEach((cell, cellIdx) => {
+      gameBoard[rowIdx][cellIdx] = 0;
+      currentBoard[rowIdx][cellIdx] = 0;
+      previousBoard[rowIdx][cellIdx] = 0;
+    });
+  });
+
+  gameStart();
 };
 
 gameStart();
