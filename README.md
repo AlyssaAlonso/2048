@@ -9,9 +9,9 @@ The game starts with two tiles, each of value 2 or 4, on the grid, and the playe
 ## Game Play
 
 <img src="./assets/images/gameplay1.png" width="400">
-<img src="./assets/images/gameplay4.png" width="400">
-<img src="./assets/images/gameplay3.png" width="400">
 <img src="./assets/images/gameplay2.png" width="400">
+<img src="./assets/images/gameplay3.png" width="400">
+<img src="./assets/images/gameplay4.png" width="400">
 
 ## Technologies Used
 
