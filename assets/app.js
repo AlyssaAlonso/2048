@@ -2,27 +2,20 @@
 const gameBoardEl = document.querySelector("#game-board");
 const rowEls = gameBoardEl.children;
 const scoreEl = document.querySelector("#score");
-const restartBtn = document.querySelector(".restart");
-const undoBtn = document.querySelector(".undo");
 const gameEndMessageEl = document.querySelector("#game-end-message");
+const undoBtn = document.querySelector(".undo");
+const restartBtn = document.querySelector(".restart");
 
 // State:
-const newCell = [2, 4];
 const arrowKeys = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
+const newCell = [2, 4];
 let score = 0;
-let previousScore = 0;
 let currentScore = 0;
+let previousScore = 0;
 let winner = false;
 let loser = false;
 
 const gameBoard = [
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-];
-
-const previousBoard = [
   [0, 0, 0, 0],
   [0, 0, 0, 0],
   [0, 0, 0, 0],
@@ -36,10 +29,20 @@ const currentBoard = [
   [0, 0, 0, 0],
 ];
 
+const previousBoard = [
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+];
+
 // Event Listeners:
+// Checks for when the player releases a key on their keyboard
 document.addEventListener("keyup", (e) => {
+  // If the player presses a key that isn't one of the arrow buttons OR if the game has ended, then it'll return
   if (!arrowKeys.includes(e.code) || winner || loser) return;
 
+  // Calls the corresponding shift function based on the player's input
   if (e.code === "ArrowUp") {
     shiftUp();
   } else if (e.code === "ArrowRight") {
@@ -50,6 +53,8 @@ document.addEventListener("keyup", (e) => {
     shiftLeft();
   }
 
+  // Checks whether or not any of the tiles shifted
+  //   If true, then a new cell (number tile) is generated and the board is rendered
   let addMoveToBoard = checkShift();
 
   if (addMoveToBoard === true) {
@@ -89,13 +94,23 @@ const findEmptyCells = () => {
 const generateNewCell = () => {
   let emptyCells = findEmptyCells();
 
-  // pick a random empty cell
+  // Randomly picks an empty cell on the game board
   let idx = Math.floor(Math.random() * emptyCells.length);
   let randomEmptyCell = emptyCells[idx];
 
-  // randomly pick 2 or 4 to be the new cell's value
+  // Randomly picks 2 or 4 to be the new cell's value
   gameBoard[randomEmptyCell[0]][randomEmptyCell[1]] =
     newCell[Math.round(Math.random())];
+};
+
+const updateCurrentBoard = () => {
+  currentScore = score;
+
+  gameBoard.forEach((row, rowIdx) => {
+    row.forEach((cell, cellIdx) => {
+      currentBoard[rowIdx][cellIdx] = gameBoard[rowIdx][cellIdx];
+    });
+  });
 };
 
 const updatepreviousBoard = () => {
@@ -105,56 +120,6 @@ const updatepreviousBoard = () => {
     row.forEach((cell, cellIdx) => {
       previousBoard[rowIdx][cellIdx] = currentBoard[rowIdx][cellIdx];
     });
-  });
-};
-
-const removeZeros = (arr) => {
-  arr = arr.filter((num) => num !== 0);
-  return arr;
-};
-
-const shiftCells = (arr) => {
-  arr = removeZeros(arr);
-
-  //   checks for possible merges
-  for (i = arr.length - 1; i >= 0; i--) {
-    if (arr[i] === arr[i - 1]) {
-      arr[i] *= 2;
-      arr[i - 1] = 0;
-      score += arr[i];
-    }
-  }
-
-  arr = removeZeros(arr);
-
-  return arr;
-};
-
-const shiftRight = () => {
-  gameBoard.forEach((row, rowIdx) => {
-    let rowArr = shiftCells(gameBoard[rowIdx]);
-    let shifted = [];
-
-    for (let i = 0; i < 4 - rowArr.length; i++) {
-      shifted.push(0);
-    }
-
-    gameBoard[rowIdx] = shifted.concat(rowArr);
-  });
-};
-
-const shiftLeft = () => {
-  gameBoard.forEach((row, rowIdx) => {
-    let rowArr = shiftCells(gameBoard[rowIdx].reverse());
-    rowArr = rowArr.reverse();
-
-    let shifted = [];
-
-    for (let i = 0; i < 4 - rowArr.length; i++) {
-      shifted.push(0);
-    }
-
-    gameBoard[rowIdx] = rowArr.concat(shifted);
   });
 };
 
@@ -168,11 +133,7 @@ const shiftUp = () => {
 
     colArr = shiftCells(colArr.reverse());
 
-    let shifted = [];
-
-    for (let i = 0; i < 4 - colArr.length; i++) {
-      shifted.push(0);
-    }
+    let shifted = addZeros(colArr.length);
 
     colArr = shifted.concat(colArr).reverse();
 
@@ -192,11 +153,7 @@ const shiftDown = () => {
 
     colArr = shiftCells(colArr);
 
-    let shifted = [];
-
-    for (let i = 0; i < 4 - colArr.length; i++) {
-      shifted.push(0);
-    }
+    let shifted = addZeros(colArr.length);
 
     colArr = shifted.concat(colArr);
 
@@ -206,9 +163,80 @@ const shiftDown = () => {
   });
 };
 
+const shiftLeft = () => {
+  gameBoard.forEach((row, rowIdx) => {
+    let rowArr = shiftCells(gameBoard[rowIdx].reverse());
+    rowArr = rowArr.reverse();
+
+    let shifted = addZeros(rowArr.length);
+
+    gameBoard[rowIdx] = rowArr.concat(shifted);
+  });
+};
+
+const shiftRight = () => {
+  gameBoard.forEach((row, rowIdx) => {
+    let rowArr = shiftCells(gameBoard[rowIdx]);
+
+    let shifted = addZeros(rowArr.length);
+
+    gameBoard[rowIdx] = shifted.concat(rowArr);
+  });
+};
+
+const shiftCells = (arr) => {
+  arr = removeZeros(arr);
+
+  //   Checks for possible merges
+  for (i = arr.length - 1; i >= 0; i--) {
+    if (arr[i] === arr[i - 1]) {
+      arr[i] *= 2;
+      arr[i - 1] = 0;
+      //   Adds the sum of the merged tiles to the player's score
+      score += arr[i];
+    }
+  }
+
+  arr = removeZeros(arr);
+
+  return arr;
+};
+
+// Removes all empty cells from the inputed row or column to make merging easier
+const removeZeros = (arr) => {
+  arr = arr.filter((num) => num !== 0);
+  return arr;
+};
+
+// Re-adds the empty cells
+const addZeros = (length) => {
+  let zerosArr = [];
+
+  for (let i = 0; i < 4 - length; i++) {
+    zerosArr.push(0);
+  }
+
+  return zerosArr;
+};
+
+const checkShift = () => {
+  let boardShift = false;
+
+  gameBoard.forEach((row, rowIdx) => {
+    row.forEach((cell, cellIdx) => {
+      if (currentBoard[rowIdx][cellIdx] !== gameBoard[rowIdx][cellIdx]) {
+        boardShift = true;
+      }
+    });
+  });
+
+  return boardShift;
+};
+
 const checkGameEnd = () => {
   updateCurrentBoard();
 
+  //   Checks if the user has won
   gameBoard.forEach((row, rowIdx) => {
     row.forEach((cell, cellIdx) => {
       if (gameBoard[rowIdx][cellIdx] === 2048) {
@@ -217,6 +245,7 @@ const checkGameEnd = () => {
     });
   });
 
+  //   Checks if all cells are full and there are no possible merges
   let numEmptyCells = findEmptyCells().length;
 
   if (numEmptyCells === 0) {
@@ -258,6 +287,7 @@ const checkGameEnd = () => {
 };
 
 const render = () => {
+  // Displays the game board
   const rowElsArr = Array.from(rowEls);
 
   rowElsArr.forEach(function (row, rowIdx) {
@@ -265,19 +295,22 @@ const render = () => {
 
     cellArr.forEach(function (cell, cellIdx) {
       cell.textContent = "";
-      cell.classList.remove(cell.classList.item(1));
+      cell.className = "cell";
 
       if (gameBoard[rowIdx][cellIdx] !== 0) {
         cell.textContent = `${gameBoard[rowIdx][cellIdx]}`;
         cell.classList.add(`_${gameBoard[rowIdx][cellIdx]}`);
+        cell.classList.add("animate");
       }
     });
   });
 
-  scoreEl.textContent = `Score: ${score}`;
+  //   Displays the player's score
+  scoreEl.innerHTML = `score:<br>${score}`;
 
+  //   Displays a message if the player has won or lost the game
   if (winner === true) {
-    gameEndMessageEl.textContent = "You win!";
+    gameEndMessageEl.textContent = "You Win!";
   }
 
   if (loser === true) {
@@ -285,6 +318,7 @@ const render = () => {
   }
 };
 
+// Restores the previous turn's game board and score
 const undoMove = () => {
   gameEndMessageEl.textContent = "";
   winner = false;
@@ -299,36 +333,7 @@ const undoMove = () => {
   });
 };
 
-const checkShift = () => {
-  let boardShift = false;
-
-  gameBoard.forEach((row, rowIdx) => {
-    row.forEach((cell, cellIdx) => {
-      if (currentBoard[rowIdx][cellIdx] !== gameBoard[rowIdx][cellIdx]) {
-        boardShift = true;
-      }
-    });
-  });
-
-  return boardShift;
-};
-
-const updateCurrentBoard = () => {
-  currentScore = score;
-
-  gameBoard.forEach((row, rowIdx) => {
-    row.forEach((cell, cellIdx) => {
-      currentBoard[rowIdx][cellIdx] = gameBoard[rowIdx][cellIdx];
-    });
-  });
-};
-
-const gameStart = () => {
-  generateNewCell();
-  generateNewCell();
-  render();
-};
-
+// Resets the state variables to allow the player to restart/replay the game
 const gameRestart = () => {
   gameEndMessageEl.textContent = "";
   winner = false;
@@ -346,6 +351,13 @@ const gameRestart = () => {
   });
 
   gameStart();
+};
+
+// Adds 2 random number tiles (each either of value 2 or 4) to the game board
+const gameStart = () => {
+  generateNewCell();
+  generateNewCell();
+  render();
 };
 
 gameStart();
