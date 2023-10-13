@@ -25,5 +25,6 @@ https://alyssaalonso.github.io/2048/
 
 ## Next Steps
 
+    ☐ Mobile adaptation
     ☐ Providing an option to continue the game after reaching 2048
     ☐ Adding multiple themes for the player to choose from
