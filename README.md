@@ -16,7 +16,7 @@ _put screenshots here_
 
 ## Getting Started
 
-_put link here_
+https://alyssaalonso.github.io/2048/
 
 ## Next Steps
 
