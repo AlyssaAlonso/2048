@@ -6,7 +6,12 @@
 
 The game starts with two tiles, each of value 2 or 4, on the grid, and the player must strategically combine and move the tiles in order to merge up to 2048. The game continues until there are no more possible moves or until the player successfully reaches 2048.
 
-_put screenshots here_
+## Game Play
+
+<img src="./assets/images/gameplay1.png" width="400">
+<img src="./assets/images/gameplay4.png" width="400">
+<img src="./assets/images/gameplay3.png" width="400">
+<img src="./assets/images/gameplay2.png" width="400">
 
 ## Technologies Used
 
